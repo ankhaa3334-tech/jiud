@@ -1,0 +1,241 @@
+import React, { useState } from 'react';
+import { ShoppingCart, User, Menu, X, Plus, Minus } from 'lucide-react';
+
+const FoodOrderApp = () => {
+  const [cart, setCart] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All dishes');
+  const [showCart, setShowCart] = useState(false);
+
+  const categories = [
+    'All dishes',
+    'Main Course', 
+    'Appetizers',
+    'Desserts',
+    'Beverages',
+    'Salads'
+  ];
+
+  const foodItems = [
+    { id: 1, name: 'Grilled Salmon', price: 24.99, image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400', category: 'Main Course', description: 'Fresh Atlantic salmon with herbs' },
+    { id: 2, name: 'Caesar Salad', price: 12.99, image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400', category: 'Salads', description: 'Classic caesar with parmesan' },
+    { id: 3, name: 'Beef Steak', price: 32.99, image: 'https://images.unsplash.com/photo-1558030006-450675393462?w=400', category: 'Main Course', description: 'Premium cut with sides' },
+    { id: 4, name: 'Pasta Carbonara', price: 18.99, image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400', category: 'Main Course', description: 'Creamy Italian pasta' },
+    { id: 5, name: 'Spring Rolls', price: 8.99, image: 'https://images.unsplash.com/photo-1594007652370-f6d6c9e28a46?w=400', category: 'Appetizers', description: 'Crispy vegetable rolls' },
+    { id: 6, name: 'Chocolate Cake', price: 9.99, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400', category: 'Desserts', description: 'Rich chocolate layers' },
+    { id: 7, name: 'Greek Salad', price: 11.99, image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400', category: 'Salads', description: 'Fresh Mediterranean mix' },
+    { id: 8, name: 'Chicken Wings', price: 14.99, image: 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400', category: 'Appetizers', description: 'Spicy buffalo wings' },
+    { id: 9, name: 'Tiramisu', price: 10.99, image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400', category: 'Desserts', description: 'Classic Italian dessert' },
+    { id: 10, name: 'Fresh Juice', price: 5.99, image: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400', category: 'Beverages', description: 'Freshly squeezed orange' },
+    { id: 11, name: 'Smoothie Bowl', price: 13.99, image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400', category: 'Desserts', description: 'Acai berry blend' },
+    { id: 12, name: 'Margherita Pizza', price: 16.99, image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400', category: 'Main Course', description: 'Classic tomato and mozzarella' },
+  ];
+
+  const filteredItems = foodItems.filter(item => {
+    return selectedCategory === 'All dishes' || item.category === selectedCategory;
+  });
+
+  const addToCart = (item) => {
+    const existingItem = cart.find(cartItem => cartItem.id === item.id);
+    if (existingItem) {
+      setCart(cart.map(cartItem =>
+        cartItem.id === item.id
+          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          : cartItem
+      ));
+    } else {
+      setCart([...cart, { ...item, quantity: 1 }]);
+    }
+  };
+
+  const removeFromCart = (itemId) => {
+    const existingItem = cart.find(cartItem => cartItem.id === itemId);
+    if (existingItem.quantity === 1) {
+      setCart(cart.filter(cartItem => cartItem.id !== itemId));
+    } else {
+      setCart(cart.map(cartItem =>
+        cartItem.id === itemId
+          ? { ...cartItem, quantity: cartItem.quantity - 1 }
+          : cartItem
+      ));
+    }
+  };
+
+  const getTotalPrice = () => {
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  const getTotalItems = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Top Navigation Bar */}
+      <nav className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-8">
+              <h1 className="text-2xl font-bold text-gray-900">Restaurant</h1>
+              <div className="hidden md:flex space-x-6">
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Home</a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Menu</a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">About</a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Contact</a>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <User className="w-6 h-6 text-gray-700" />
+              </button>
+              <button
+                onClick={() => setShowCart(!showCart)}
+                className="relative p-2 hover:bg-gray-100 rounded-full"
+              >
+                <ShoppingCart className="w-6 h-6 text-gray-700" />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
+              <button className="md:hidden p-2 hover:bg-gray-100 rounded-full">
+                <Menu className="w-6 h-6 text-gray-700" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Category Filters */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center space-x-3 overflow-x-auto pb-2">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                  selectedCategory === category
+                    ? 'bg-red-500 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* Food Grid */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredItems.map(item => (
+            <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+              <div className="relative h-48 bg-gray-100">
+                <img 
+                  src={item.image} 
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-lg text-gray-900">{item.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-2xl font-bold text-gray-900">${item.price}</span>
+                  <button
+                    onClick={() => addToCart(item)}
+                    className="bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600 transition-colors font-medium text-sm"
+                  >
+                    Add to cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      {/* Cart Sidebar */}
+      {showCart && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-40 z-40"
+            onClick={() => setShowCart(false)}
+          />
+          <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">Your Cart</h2>
+              <button 
+                onClick={() => setShowCart(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+              >
+                <X className="w-6 h-6 text-gray-700" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6">
+              {cart.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <ShoppingCart className="w-20 h-20 mb-4" />
+                  <p className="text-lg">Your cart is empty</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {cart.map(item => (
+                    <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                        <p className="text-red-500 font-bold mt-1">${item.price}</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="font-bold text-gray-900 w-8 text-center">{item.quantity}</span>
+                        <button
+                          onClick={() => addToCart(item)}
+                          className="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {cart.length > 0 && (
+              <div className="border-t border-gray-200 p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold text-gray-700">Subtotal</span>
+                  <span className="text-2xl font-bold text-gray-900">${getTotalPrice().toFixed(2)}</span>
+                </div>
+                <button className="w-full bg-red-500 text-white py-4 rounded-full font-bold text-lg hover:bg-red-600 transition-colors">
+                  Checkout
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default FoodOrderApp;
