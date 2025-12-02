@@ -1,241 +1,452 @@
-import React, { useState } from 'react';
-import { ShoppingCart, User, Menu, X, Plus, Minus } from 'lucide-react';
+import React, { useState } from "react";
+import { Menu, ShoppingCart, Plus, Edit2, Trash2, X } from "lucide-react";
 
-const FoodOrderApp = () => {
-  const [cart, setCart] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('All dishes');
-  const [showCart, setShowCart] = useState(false);
-
-  const categories = [
-    'All dishes',
-    'Main Course', 
-    'Appetizers',
-    'Desserts',
-    'Beverages',
-    'Salads'
-  ];
-
-  const foodItems = [
-    { id: 1, name: 'Grilled Salmon', price: 24.99, image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400', category: 'Main Course', description: 'Fresh Atlantic salmon with herbs' },
-    { id: 2, name: 'Caesar Salad', price: 12.99, image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400', category: 'Salads', description: 'Classic caesar with parmesan' },
-    { id: 3, name: 'Beef Steak', price: 32.99, image: 'https://images.unsplash.com/photo-1558030006-450675393462?w=400', category: 'Main Course', description: 'Premium cut with sides' },
-    { id: 4, name: 'Pasta Carbonara', price: 18.99, image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400', category: 'Main Course', description: 'Creamy Italian pasta' },
-    { id: 5, name: 'Spring Rolls', price: 8.99, image: 'https://images.unsplash.com/photo-1594007652370-f6d6c9e28a46?w=400', category: 'Appetizers', description: 'Crispy vegetable rolls' },
-    { id: 6, name: 'Chocolate Cake', price: 9.99, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400', category: 'Desserts', description: 'Rich chocolate layers' },
-    { id: 7, name: 'Greek Salad', price: 11.99, image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400', category: 'Salads', description: 'Fresh Mediterranean mix' },
-    { id: 8, name: 'Chicken Wings', price: 14.99, image: 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400', category: 'Appetizers', description: 'Spicy buffalo wings' },
-    { id: 9, name: 'Tiramisu', price: 10.99, image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400', category: 'Desserts', description: 'Classic Italian dessert' },
-    { id: 10, name: 'Fresh Juice', price: 5.99, image: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400', category: 'Beverages', description: 'Freshly squeezed orange' },
-    { id: 11, name: 'Smoothie Bowl', price: 13.99, image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400', category: 'Desserts', description: 'Acai berry blend' },
-    { id: 12, name: 'Margherita Pizza', price: 16.99, image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400', category: 'Main Course', description: 'Classic tomato and mozzarella' },
-  ];
-
-  const filteredItems = foodItems.filter(item => {
-    return selectedCategory === 'All dishes' || item.category === selectedCategory;
+export default function FoodDeliveryDashboard() {
+  const [activeCategory, setActiveCategory] = useState("All Dishes");
+  const [showModal, setShowModal] = useState(false);
+  const [editingDish, setEditingDish] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    price: '',
+    description: '',
+    image: '',
+    category: 'Pizzas'
   });
 
-  const addToCart = (item) => {
-    const existingItem = cart.find(cartItem => cartItem.id === item.id);
-    if (existingItem) {
-      setCart(cart.map(cartItem =>
-        cartItem.id === item.id
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
-          : cartItem
-      ));
-    } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
+  const categories = [
+    { name: "All Dishes", count: 112 },
+    { name: "Appetizers", count: 6 },
+    { name: "Salads", count: 3 },
+    { name: "Pizzas", count: 5 },
+    { name: "Lunch favorites", count: 5 },
+    { name: "Main dishes", count: 5 },
+    { name: "Fish & Sea foods", count: 5 },
+  ];
+
+  const secondaryCategories = [
+    { name: "Brunch", count: 5 },
+    { name: "Side dish", count: 5 },
+    { name: "Desserts", count: 5 },
+    { name: "Beverages", count: 5 },
+  ];
+
+  const [allDishes, setAllDishes] = useState([
+    {
+      id: 1,
+      name: "Grilled Chicken cobb salad",
+      price: 12.99,
+      description: "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar.",
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop",
+      category: "Pizzas"
+    },
+    {
+      id: 2,
+      name: "Burrata Caprese",
+      price: 12.99,
+      description: "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar.",
+      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop",
+      category: "Pizzas"
+    },
+    {
+      id: 3,
+      name: "Beetroot and orange salad",
+      price: 12.99,
+      description: "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar.",
+      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop",
+      category: "Pizzas"
+    },
+    {
+      id: 4,
+      name: "Caesar Salad",
+      price: 10.99,
+      description: "Fresh romaine lettuce with parmesan cheese.",
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop",
+      category: "Salads"
+    },
+    {
+      id: 5,
+      name: "Greek Salad",
+      price: 11.99,
+      description: "Mediterranean mix with feta cheese.",
+      image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop",
+      category: "Salads"
+    },
+    {
+      id: 6,
+      name: "Chicken Wings",
+      price: 14.99,
+      description: "Spicy buffalo wings with ranch sauce.",
+      image: "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400&h=300&fit=crop",
+      category: "Appetizers"
+    },
+    {
+      id: 7,
+      name: "Spring Rolls",
+      price: 8.99,
+      description: "Crispy vegetable spring rolls.",
+      image: "https://images.unsplash.com/photo-1594007652370-f6d6c9e28a46?w=400&h=300&fit=crop",
+      category: "Appetizers"
+    },
+    {
+      id: 8,
+      name: "Beef Steak",
+      price: 32.99,
+      description: "Premium cut with herb butter.",
+      image: "https://images.unsplash.com/photo-1558030006-450675393462?w=400&h=300&fit=crop",
+      category: "Main dishes"
+    },
+    {
+      id: 9,
+      name: "Grilled Salmon",
+      price: 24.99,
+      description: "Fresh Atlantic salmon with lemon.",
+      image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop",
+      category: "Fish & Sea foods"
+    },
+    {
+      id: 10,
+      name: "Shrimp Pasta",
+      price: 18.99,
+      description: "Creamy garlic shrimp linguine.",
+      image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop",
+      category: "Fish & Sea foods"
+    },
+    {
+      id: 11,
+      name: "Pancakes",
+      price: 9.99,
+      description: "Fluffy buttermilk pancakes with maple syrup.",
+      image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
+      category: "Brunch"
+    },
+    {
+      id: 12,
+      name: "French Toast",
+      price: 10.99,
+      description: "Classic french toast with berries.",
+      image: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&h=300&fit=crop",
+      category: "Brunch"
+    },
+  ]);
+
+  const getFilteredDishes = (categoryName) => {
+    if (categoryName === "All Dishes") {
+      return allDishes;
+    }
+    return allDishes.filter(dish => dish.category === categoryName);
+  };
+
+  const getCategoryCount = (categoryName) => {
+    if (categoryName === "All Dishes") {
+      return allDishes.length;
+    }
+    return allDishes.filter(dish => dish.category === categoryName).length;
+  };
+
+  const handleAddNew = (category) => {
+    setEditingDish(null);
+    setFormData({
+      name: '',
+      price: '',
+      description: '',
+      image: '',
+      category: category === "All Dishes" ? "Pizzas" : category
+    });
+    setShowModal(true);
+  };
+
+  const handleEdit = (dish) => {
+    setEditingDish(dish);
+    setFormData({
+      name: dish.name,
+      price: dish.price.toString(),
+      description: dish.description,
+      image: dish.image,
+      category: dish.category
+    });
+    setShowModal(true);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Энэ хоолыг устгах уу?')) {
+      setAllDishes(allDishes.filter(dish => dish.id !== id));
     }
   };
 
-  const removeFromCart = (itemId) => {
-    const existingItem = cart.find(cartItem => cartItem.id === itemId);
-    if (existingItem.quantity === 1) {
-      setCart(cart.filter(cartItem => cartItem.id !== itemId));
-    } else {
-      setCart(cart.map(cartItem =>
-        cartItem.id === itemId
-          ? { ...cartItem, quantity: cartItem.quantity - 1 }
-          : cartItem
-      ));
+  const handleSubmit = () => {
+    if (!formData.name || !formData.price || !formData.description || !formData.image) {
+      alert('Бүх талбарыг бөглөнө үү!');
+      return;
     }
+
+    if (editingDish) {
+      setAllDishes(allDishes.map(dish =>
+        dish.id === editingDish.id
+          ? { ...dish, ...formData, price: parseFloat(formData.price) }
+          : dish
+      ));
+    } else {
+      const newDish = {
+        id: Date.now(),
+        ...formData,
+        price: parseFloat(formData.price)
+      };
+      setAllDishes([...allDishes, newDish]);
+    }
+
+    setShowModal(false);
   };
 
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  const getTotalItems = () => {
-    return cart.reduce((total, item) => total + item.quantity, 0);
-  };
+  const displayedDishes = getFilteredDishes(activeCategory);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Top Navigation Bar */}
-      <nav className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold text-gray-900">Restaurant</h1>
-              <div className="hidden md:flex space-x-6">
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Home</a>
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Menu</a>
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">About</a>
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Contact</a>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <User className="w-6 h-6 text-gray-700" />
-              </button>
-              <button
-                onClick={() => setShowCart(!showCart)}
-                className="relative p-2 hover:bg-gray-100 rounded-full"
-              >
-                <ShoppingCart className="w-6 h-6 text-gray-700" />
-                {getTotalItems() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                    {getTotalItems()}
-                  </span>
-                )}
-              </button>
-              <button className="md:hidden p-2 hover:bg-gray-100 rounded-full">
-                <Menu className="w-6 h-6 text-gray-700" />
-              </button>
-            </div>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-lg p-6">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+            <div className="w-6 h-1 bg-white rounded"></div>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-800">NomNom</h1>
+            <p className="text-sm text-gray-500">Swift delivery</p>
           </div>
         </div>
-      </nav>
+        
+        <nav className="space-y-2">
+          <button className="flex items-center gap-3 w-full px-4 py-3 bg-gray-900 text-white rounded-xl font-medium">
+            <Menu size={20} />
+            Food menu
+          </button>
+          <button className="flex items-center gap-3 w-full px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl font-medium">
+            <ShoppingCart size={20} />
+            Orders
+          </button>
+        </nav>
+      </div>
 
-      {/* Category Filters */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center space-x-3 overflow-x-auto pb-2">
-            {categories.map(category => (
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-2 text-blue-500">
+            <Menu size={20} />
+            <span className="font-semibold">Category</span>
+          </div>
+          <div className="w-10 h-10 bg-purple-500 rounded-full overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
+              alt="User"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Category Section */}
+        <div className="bg-white rounded-2xl p-6 mb-8 border-2">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Dishes category</h2>
+          
+          {/* Primary Categories */}
+          <div className="flex flex-wrap gap-3 mb-4">
+            {categories.map((cat) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                  selectedCategory === category
-                    ? 'bg-red-500 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                key={cat.name}
+                onClick={() => setActiveCategory(cat.name)}
+                className={`px-4 py-2 rounded-full font-medium transition-all ${
+                  activeCategory === cat.name
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                {category}
+                {cat.name} <span className="ml-1 font-bold">{getCategoryCount(cat.name)}</span>
               </button>
             ))}
           </div>
-        </div>
-      </nav>
 
-      {/* Food Grid */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map(item => (
-            <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
-              <div className="relative h-48 bg-gray-100">
-                <img 
-                  src={item.image} 
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                />
+          {/* Secondary Categories */}
+          <div className="flex flex-wrap gap-3">
+            {secondaryCategories.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setActiveCategory(cat.name)}
+                className={`px-4 py-2 rounded-full font-medium transition-all ${
+                  activeCategory === cat.name
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {cat.name} <span className="ml-1 font-bold">{getCategoryCount(cat.name)}</span>
+              </button>
+            ))}
+            <button 
+              onClick={() => handleAddNew(activeCategory)}
+              className="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Dishes Section */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-gray-800 mb-6">
+            {activeCategory} ({displayedDishes.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Add New Card */}
+            <div 
+              onClick={() => handleAddNew(activeCategory)}
+              className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[280px] hover:border-red-400 hover:bg-red-50 transition-all cursor-pointer"
+            >
+              <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center mb-4">
+                <Plus size={28} />
               </div>
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900">{item.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+              <p className="text-gray-600 font-medium text-center">
+                Add new Dish to<br />{activeCategory}
+              </p>
+            </div>
+
+            {/* Dish Cards */}
+            {displayedDishes.map((dish) => (
+              <div
+                key={dish.id}
+                className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all"
+              >
+                <div className="relative">
+                  <img
+                    src={dish.image}
+                    alt={dish.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    <button 
+                      onClick={() => handleEdit(dish)}
+                      className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-50"
+                    >
+                      <Edit2 size={18} className="text-blue-500" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(dish.id)}
+                      className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-50"
+                    >
+                      <Trash2 size={18} className="text-red-500" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between mt-4">
-                  <span className="text-2xl font-bold text-gray-900">${item.price}</span>
-                  <button
-                    onClick={() => addToCart(item)}
-                    className="bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600 transition-colors font-medium text-sm"
-                  >
-                    Add to cart
-                  </button>
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="text-red-500 font-semibold text-lg">{dish.name}</h4>
+                    <span className="font-bold text-gray-800">${dish.price}</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">{dish.description}</p>
+                  <div className="mt-2">
+                    <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                      {dish.category}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </main>
+      </div>
 
-      {/* Cart Sidebar */}
-      {showCart && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-40 z-40"
-            onClick={() => setShowCart(false)}
-          />
-          <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Your Cart</h2>
+      {/* Add/Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800">
+                {editingDish ? 'Хоол засах' : 'Шинэ хоол нэмэх'}
+              </h3>
               <button 
-                onClick={() => setShowCart(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition"
+                onClick={() => setShowModal(false)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center"
               >
-                <X className="w-6 h-6 text-gray-700" />
+                <X size={20} />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
-              {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                  <ShoppingCart className="w-20 h-20 mb-4" />
-                  <p className="text-lg">Your cart is empty</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {cart.map(item => (
-                    <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                      <img 
-                        src={item.image} 
-                        alt={item.name}
-                        className="w-20 h-20 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                        <p className="text-red-500 font-bold mt-1">${item.price}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="font-bold text-gray-900 w-8 text-center">{item.quantity}</span>
-                        <button
-                          onClick={() => addToCart(item)}
-                          className="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Нэр</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="Хоолны нэр"
+                />
+              </div>
 
-            {cart.length > 0 && (
-              <div className="border-t border-gray-200 p-6 space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-700">Subtotal</span>
-                  <span className="text-2xl font-bold text-gray-900">${getTotalPrice().toFixed(2)}</span>
-                </div>
-                <button className="w-full bg-red-500 text-white py-4 rounded-full font-bold text-lg hover:bg-red-600 transition-colors">
-                  Checkout
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Үнэ ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="12.99"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Тайлбар</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  rows={3}
+                  placeholder="Хоолны тайлбар"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Зургийн URL</label>
+                <input
+                  type="url"
+                  value={formData.image}
+                  onChange={(e) => setFormData({...formData, image: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ангилал</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                >
+                  {categories.filter(c => c.name !== 'All Dishes').map(cat => (
+                    <option key={cat.name} value={cat.name}>{cat.name}</option>
+                  ))}
+                  {secondaryCategories.map(cat => (
+                    <option key={cat.name} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all"
+                >
+                  Цуцлах
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all"
+                >
+                  {editingDish ? 'Хадгалах' : 'Нэмэх'}
                 </button>
               </div>
-            )}
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
-};
-
-export default FoodOrderApp;
+}
